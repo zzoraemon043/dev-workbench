@@ -1,0 +1,33 @@
+name: ✨ Feature request
+description: Suggest a new tool or an improvement to an existing one
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve?
+      description: Describe the workflow that is painful today.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: How should it work in Dev Workbench? Mock-ups welcome.
+    validations:
+      required: true
+  - type: checkboxes
+    id: offline
+    attributes:
+      label: Offline-first check
+      options:
+        - label: This feature can run entirely in the browser without a backend or third-party API.
+          required: true
+  - type: dropdown
+    id: contribute
+    attributes:
+      label: Would you like to implement it?
+      options:
+        - Yes, I'd like to open a PR
+        - Maybe, with some guidance
+        - No

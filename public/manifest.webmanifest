@@ -1,0 +1,11 @@
+{
+  "name": "Dev Workbench",
+  "short_name": "Workbench",
+  "description": "The offline-first developer toolbox: JSON, Regex, JWT, Diff, Codec and WebSocket tools in one tab.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0b0c10",
+  "theme_color": "#6457f9",
+  "icons": [{ "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
