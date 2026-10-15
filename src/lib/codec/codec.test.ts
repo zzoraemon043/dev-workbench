@@ -24,16 +24,16 @@ describe('bytes', () => {
 
 describe('transforms', () => {
   it('encodes and decodes UTF-8 safely', async () => {
-    expect(await run('base64-encode', 'héllo 👋')).toBe('aMOpbGxvIPCfkYs=')
-    expect(await run('base64-decode', 'aMOpbGxvIPCfkYs=')).toBe('héllo 👋')
+    expect(await run('base64-encode', 'héllo 𝄞')).toBe('aMOpbGxvIPCdhJ4=')
+    expect(await run('base64-decode', 'aMOpbGxvIPCdhJ4=')).toBe('héllo 𝄞')
     expect(await run('hex-decode', await run('hex-encode', 'ok✓'))).toBe('ok✓')
   })
 
   it('escapes HTML and unicode', async () => {
     expect(await run('html-escape', `<a href="x">&</a>`)).toBe('&lt;a href=&quot;x&quot;&gt;&amp;&lt;/a&gt;')
-    expect(await run('html-unescape', '&lt;&#x1F44B;&#65;&copy;&bogus;')).toBe('<👋A©&bogus;')
-    expect(await run('unicode-escape', 'é👋')).toBe('\\u00e9\\u{1f44b}')
-    expect(await run('unicode-unescape', '\\u00e9\\u{1f44b}')).toBe('é👋')
+    expect(await run('html-unescape', '&lt;&#x1D11E;&#65;&copy;&bogus;')).toBe('<𝄞A©&bogus;')
+    expect(await run('unicode-escape', 'é𝄞')).toBe('\\u00e9\\u{1d11e}')
+    expect(await run('unicode-unescape', '\\u00e9\\u{1d11e}')).toBe('é𝄞')
   })
 
   it('hashes with SHA-256', async () => {

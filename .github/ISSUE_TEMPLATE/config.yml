@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 💬 Questions & ideas
+  - name: Questions and ideas
     url: https://github.com/zzoraemon043/dev-workbench/discussions
     about: Ask questions and share ideas with the community.
-  - name: 🔒 Security vulnerability
+  - name: Security vulnerability
     url: https://github.com/zzoraemon043/dev-workbench/security/advisories/new
     about: Report security issues privately.

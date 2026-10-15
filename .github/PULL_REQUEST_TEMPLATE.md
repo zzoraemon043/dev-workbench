@@ -4,11 +4,11 @@
 
 ## Type of change
 
-- [ ] 🐛 Bug fix
-- [ ] ✨ New feature or tool
-- [ ] ♻️ Refactor (no behavior change)
-- [ ] 📝 Documentation
-- [ ] 🧪 Tests or tooling
+- [ ] Bug fix
+- [ ] New feature or tool
+- [ ] Refactor (no behavior change)
+- [ ] Documentation
+- [ ] Tests or tooling
 
 ## Screenshots
 

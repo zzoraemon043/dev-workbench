@@ -207,7 +207,7 @@ JSON, regex, JWT, diff, encoder pipelines and a WebSocket console in one beautif
 **Maker's first comment**
 
 ```
-Hey Product Hunt! 👋
+Hey Product Hunt,
 
 I'm the maker of Dev Workbench. Like most developers, I used to paste JWTs,
 API responses and config files into whatever online formatter came up first —
@@ -217,12 +217,12 @@ Dev Workbench is my answer: a single, fast tab with the tools I use daily, built
 so that nothing you paste ever leaves your browser. There's literally no backend.
 
 A few things I'm proud of:
-🪄 Smart paste — Cmd/Ctrl+V anywhere and it detects JWT, JSON, URLs, base64,
-   timestamps and WebSocket endpoints, then opens the right tool
-🔐 Offline JWT verification and re-signing with the Web Crypto API
-⛓️ Drag-and-drop transform pipelines (base64 → JSON → …)
-🔗 Share links that store state in the URL itself — still no server
-⌨️ Command palette and shortcuts for everything
+- Smart paste: Cmd/Ctrl+V anywhere and it detects JWT, JSON, URLs, base64,
+  timestamps and WebSocket endpoints, then opens the right tool
+- Offline JWT verification and re-signing with the Web Crypto API
+- Drag-and-drop transform pipelines (base64 → JSON → …)
+- Share links that store state in the URL itself — still no server
+- Command palette and shortcuts for everything
 
 It's free and MIT-licensed. I'd love to hear which tool you'd want next!
 ```

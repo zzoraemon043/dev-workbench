@@ -13,7 +13,7 @@
 [![GitHub Stars](https://img.shields.io/github/stars/zzoraemon043/dev-workbench?style=flat-square&color=f5b942)](https://github.com/zzoraemon043/dev-workbench/stargazers)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-22c55e?style=flat-square)](CONTRIBUTING.md)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square&logo=typescript&logoColor=white)](tsconfig.app.json)
-[![100% client-side](https://img.shields.io/badge/data_sent_to_servers-0_bytes-0ea5e9?style=flat-square)](#-privacy-by-architecture)
+[![100% client-side](https://img.shields.io/badge/data_sent_to_servers-0_bytes-0ea5e9?style=flat-square)](#privacy-by-architecture)
 
 [**Live demo**](https://zzoraemon043.github.io/dev-workbench/) · [Features](#-features) · [Quick start](#-quick-start) · [Architecture](#-architecture) · [Contributing](CONTRIBUTING.md)
 
@@ -29,26 +29,26 @@ Every developer has a bookmark folder full of single-purpose websites: one to pr
 
 **Dev Workbench** replaces that folder with one fast, keyboard-driven tab that never talks to a backend. It is a static site: open it once and it keeps working on a plane.
 
-## ✨ Features
+## Features
 
-| | Tool | What makes it different |
-|---|---|---|
-| `{ }` | **JSON Studio** | Validation with exact line/column errors and jump-to-error · collapsible tree with **click-to-copy JSONPath** · **JSON → TypeScript interfaces** (optional keys, unions, deduplicated shapes) · JSONPath query with `..` recursive descent, `[*]` and negative indices |
-| `.*` | **Regex Lab** | Live in-editor match highlighting · named & numbered capture groups with offsets · replace preview with `$<name>` · **plain-English explanation** of every token · runs in a **Web Worker with a 1.5 s kill switch**, so `(a+)+$` can never freeze your tab |
-| 🔑 | **JWT Inspector** | Color-coded token anatomy · human-readable claims with live expiry countdown · **offline HS256/384/512 verification** via Web Crypto · **edit the payload and re-sign** to craft test tokens |
-| ± | **Diff Studio** | Myers O(ND) line diff with **word-level highlights** · split & unified views · ignore whitespace/case · copy as unified patch |
-| ⛓ | **Codec Pipeline** | **Chain transforms like CyberChef-lite**: Base64/URL/Hex/HTML/Unicode, SHA-1/256/384/512, case conversion, timestamps, query-string → JSON · **drag to reorder** · per-step previews & timing |
-| 📡 | **Socket Console** | Connect to any `ws://`/`wss://` endpoint · JSON-aware frame log with filters, byte counters and expandable payloads · export the session as JSON |
+| Tool | What makes it different |
+|---|---|
+| **JSON Studio** | Validation with exact line/column errors and jump-to-error · collapsible tree with **click-to-copy JSONPath** · **JSON → TypeScript interfaces** (optional keys, unions, deduplicated shapes) · JSONPath query with `..` recursive descent, `[*]` and negative indices |
+| **Regex Lab** | Live in-editor match highlighting · named & numbered capture groups with offsets · replace preview with `$<name>` · **plain-English explanation** of every token · runs in a **Web Worker with a 1.5 s kill switch**, so `(a+)+$` can never freeze your tab |
+| **JWT Inspector** | Color-coded token anatomy · human-readable claims with live expiry countdown · **offline HS256/384/512 verification** via Web Crypto · **edit the payload and re-sign** to craft test tokens |
+| **Diff Studio** | Myers O(ND) line diff with **word-level highlights** · split & unified views · ignore whitespace/case · copy as unified patch |
+| **Codec Pipeline** | **Chain transforms like CyberChef-lite**: Base64/URL/Hex/HTML/Unicode, SHA-1/256/384/512, case conversion, timestamps, query-string → JSON · **drag to reorder** · per-step previews & timing |
+| **Socket Console** | Connect to any `ws://`/`wss://` endpoint · JSON-aware frame log with filters, byte counters and expandable payloads · export the session as JSON |
 
-### Workbench-wide superpowers
+### Workbench-wide capabilities
 
-- 🪄 **Smart paste** — press <kbd>Ctrl/⌘</kbd>+<kbd>V</kbd> anywhere outside an editor. A JWT opens the JWT Inspector, JSON opens JSON Studio, `wss://…` opens the Socket Console, base64 or a Unix timestamp lands in the Codec Pipeline with the right decoder already attached.
-- 🔗 **Share links without a server** — <kbd>Alt</kbd>+<kbd>S</kbd> compresses the current tool's state (`deflate-raw` + base64url) into the URL hash. Hashes are never sent to servers, and **secrets such as HMAC keys are never included**.
-- ⌨️ **Keyboard-first** — <kbd>Ctrl/⌘</kbd>+<kbd>K</kbd> command palette with fuzzy search, <kbd>Alt</kbd>+<kbd>1–6</kbd> to switch tools, <kbd>Ctrl/⌘</kbd>+<kbd>Enter</kbd> runs each tool's primary action, <kbd>?</kbd> lists everything.
-- 📂 **Drag & drop files** onto any editor.
-- 🌗 **Light, dark & system themes** with no flash on load.
-- 💾 **Your workspace persists** locally between visits.
-- 📴 **Installable PWA** that works fully offline.
+- **Smart paste** — press <kbd>Ctrl/⌘</kbd>+<kbd>V</kbd> anywhere outside an editor. A JWT opens the JWT Inspector, JSON opens JSON Studio, `wss://…` opens the Socket Console, base64 or a Unix timestamp lands in the Codec Pipeline with the right decoder already attached.
+- **Share links without a server** — <kbd>Alt</kbd>+<kbd>S</kbd> compresses the current tool's state (`deflate-raw` + base64url) into the URL hash. Hashes are never sent to servers, and **secrets such as HMAC keys are never included**.
+- **Keyboard-first** — <kbd>Ctrl/⌘</kbd>+<kbd>K</kbd> command palette with fuzzy search, <kbd>Alt</kbd>+<kbd>1–6</kbd> to switch tools, <kbd>Ctrl/⌘</kbd>+<kbd>Enter</kbd> runs each tool's primary action, <kbd>?</kbd> lists everything.
+- **Drag and drop**: drop a file onto any editor to load it.
+- **Theming**: light, dark and system modes with no flash on load.
+- **Local persistence**: workspace state is restored from `localStorage` between visits.
+- **Installable PWA**: a service worker caches the app shell so it runs fully offline.
 
 <table>
   <tr>
@@ -65,7 +65,7 @@ Every developer has a bookmark folder full of single-purpose websites: one to pr
   </tr>
 </table>
 
-## 🚀 Quick start
+## Quick start
 
 **Use it now:** open the [live demo](https://zzoraemon043.github.io/dev-workbench/) — nothing to install.
 
@@ -87,7 +87,7 @@ Then open http://localhost:5173. Requires Node.js 22.13+ (see `.nvmrc`).
 
 **Self-host anywhere:** `dist/` is plain static files. Drop it on GitHub Pages, Netlify, Vercel, Cloudflare Pages, S3, or `python -m http.server`. To serve from a sub-path, build with `BASE_PATH=/your-path/ npm run build`.
 
-## 🏗 Architecture
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -136,14 +136,14 @@ src/
 └── tools/          one folder per tool, lazy-loaded
 ```
 
-## 🔒 Privacy by architecture
+## Privacy by architecture
 
 - No analytics, cookies, or third-party scripts. Fonts are system fonts.
 - All parsing, hashing and signing happens in your browser via standard Web APIs.
 - Share links live in the URL **fragment**, which browsers never send to servers.
 - HMAC secrets are excluded from share links and stay in your local storage only. Clear them any time via the command palette (**Reset tool**).
 
-## 🗺 Roadmap
+## Roadmap
 
 - [ ] RS256/ES256 verification with a pasted JWK/PEM
 - [ ] JSON Schema validation & schema generation
@@ -154,19 +154,19 @@ src/
 
 Have an idea? [Open a feature request](https://github.com/zzoraemon043/dev-workbench/issues/new?template=feature_request.yml) — tools are designed to be easy to contribute.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions of every size are welcome — from typo fixes to whole new tools. Read the [contributing guide](CONTRIBUTING.md) to get started and look for issues labelled [`good first issue`](https://github.com/zzoraemon043/dev-workbench/labels/good%20first%20issue).
 
 By participating you agree to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
-## ⭐ Support
+## Support
 
 If Dev Workbench saved you a trip to a sketchy ad-covered website, **give it a star** — it genuinely helps other developers find it.
 
 [![Star History Chart](https://api.star-history.com/svg?repos=zzoraemon043/dev-workbench&type=Date)](https://star-history.com/#zzoraemon043/dev-workbench&Date)
 
-## 📄 License
+## License
 
-[MIT](LICENSE) © Dev Workbench contributors
+[MIT](LICENSE). Copyright (c) 2026 Dev Workbench contributors.
 
