@@ -169,3 +169,4 @@ If Dev Workbench saved you a trip to a sketchy ad-covered website, **give it a s
 ## 📄 License
 
 [MIT](LICENSE) © Dev Workbench contributors
+
