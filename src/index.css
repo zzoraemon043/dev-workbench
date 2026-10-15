@@ -1,0 +1,149 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f7f8fa;
+  --surface: #ffffff;
+  --surface-2: #f2f4f7;
+  --line: #e6e8ee;
+  --line-strong: #d3d7e0;
+  --fg: #0e1220;
+  --muted: #667085;
+  --accent: #6457f9;
+  --match-a: rgb(100 87 249 / 0.22);
+  --match-b: rgb(14 165 233 / 0.24);
+  --glow: rgb(100 87 249 / 0.07);
+}
+
+.dark {
+  --bg: #0b0c10;
+  --surface: #121318;
+  --surface-2: #181a21;
+  --line: #24262f;
+  --line-strong: #343744;
+  --fg: #e8eaf0;
+  --muted: #8a91a5;
+  --accent: #8b7dff;
+  --match-a: rgb(139 125 255 / 0.3);
+  --match-b: rgb(56 189 248 / 0.28);
+  --glow: rgb(139 125 255 / 0.08);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, 'Cascadia Code', Menlo, Consolas, monospace;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg font-sans text-fg antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-strong) transparent;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 28%, transparent);
+  }
+
+  :focus-visible {
+    outline-color: var(--accent);
+  }
+
+  dialog::backdrop {
+    background: rgb(5 6 10 / 0.45);
+    backdrop-filter: blur(4px);
+  }
+}
+
+@layer components {
+  .app-backdrop {
+    background-image:
+      radial-gradient(60rem 30rem at 110% -10%, var(--glow), transparent 60%),
+      radial-gradient(40rem 24rem at -10% 110%, var(--glow), transparent 60%);
+  }
+
+  .match-a {
+    background: var(--match-a);
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px color-mix(in oklab, var(--accent) 35%, transparent);
+  }
+
+  .match-b {
+    background: var(--match-b);
+    border-radius: 3px;
+    box-shadow: 0 0 0 1px rgb(14 165 233 / 0.35);
+  }
+}
+
+@utility animate-in {
+  animation: fade-in 160ms ease-out both;
+}
+
+@utility fade-slide {
+  animation: fade-slide 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@utility toast-in {
+  animation: toast-in 260ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+@utility dialog-pop {
+  &[open] {
+    animation: dialog-pop 180ms cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-slide {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+  }
+}
+
+@keyframes dialog-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    transition-duration: 1ms !important;
+  }
+}
