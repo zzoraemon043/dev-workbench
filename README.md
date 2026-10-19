@@ -15,7 +15,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6?style=flat-square&logo=typescript&logoColor=white)](tsconfig.app.json)
 [![100% client-side](https://img.shields.io/badge/data_sent_to_servers-0_bytes-0ea5e9?style=flat-square)](#privacy-by-architecture)
 
-[**Live demo**](https://zzoraemon043.github.io/dev-workbench/) · [Features](#-features) · [Quick start](#-quick-start) · [Architecture](#-architecture) · [Contributing](CONTRIBUTING.md)
+[**Live demo**](https://zzoraemon043.github.io/dev-workbench/) · [Features](#features) · [Quick start](#quick-start) · [Architecture](#architecture) · [Contributing](CONTRIBUTING.md)
 
 <img src="docs/screenshots/json-studio.png" alt="Dev Workbench — JSON Studio in dark mode" width="100%" />
 
