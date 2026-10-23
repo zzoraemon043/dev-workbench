@@ -1,5 +1,7 @@
-const CACHE = 'dev-workbench-v1'
-const SHELL = ['./', './index.html', './favicon.svg', './manifest.webmanifest']
+const BUILD = 'dev'
+const ASSETS = []
+const CACHE = `dev-workbench-${BUILD}`
+const SHELL = ['./', './index.html', './favicon.svg', './manifest.webmanifest', ...ASSETS]
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)).then(() => self.skipWaiting()))
@@ -32,7 +34,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   event.respondWith(
-    caches.match(request).then(
+    caches.match(request, { ignoreVary: true }).then(
       (cached) =>
         cached ??
         fetch(request).then((response) => {
