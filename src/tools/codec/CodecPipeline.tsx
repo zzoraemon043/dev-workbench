@@ -63,7 +63,7 @@ export default function CodecPipeline() {
   }
 
   return (
-    <div className="grid h-full min-h-[680px] gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)_minmax(0,1fr)]">
+    <div className="grid h-full min-h-[680px] grid-rows-[minmax(200px,1fr)_minmax(320px,auto)_minmax(200px,1fr)] gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)_minmax(0,1fr)] lg:grid-rows-1">
       <Panel title="Input" icon={FileInput} actions={<CopyButton text={state.input} />} bodyClassName="flex">
         <CodeEditor
           ariaLabel="Codec input"
