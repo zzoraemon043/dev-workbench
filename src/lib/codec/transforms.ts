@@ -62,13 +62,14 @@ function digest(algorithm: 'SHA-1' | 'SHA-256' | 'SHA-384' | 'SHA-512') {
   return async (input: string) => bytesToHex(new Uint8Array(await crypto.subtle.digest(algorithm, utf8Encode(input))))
 }
 
+function codePointText(code: number, original: string): string {
+  return Number.isInteger(code) && code >= 0 && code <= 0x10ffff ? String.fromCodePoint(code) : original
+}
+
 function parseTimestamp(input: string): Date {
   const value = input.trim()
-  if (/^-?\d+(\.\d+)?$/.test(value)) {
-    const numeric = Number(value)
-    return new Date(Math.abs(numeric) < 1e11 ? numeric * 1000 : numeric)
-  }
-  const date = new Date(value)
+  const numeric = /^-?\d+(\.\d+)?$/.test(value) ? Number(value) : null
+  const date = numeric === null ? new Date(value) : new Date(Math.abs(numeric) < 1e11 ? numeric * 1000 : numeric)
   if (Number.isNaN(date.getTime())) throw new Error('Not a recognizable date or timestamp')
   return date
 }
@@ -106,7 +107,7 @@ export const TRANSFORMS: Transform[] = [
       s.replace(/&(#x[\da-f]+|#\d+|[a-z]+);/gi, (entity, body: string) => {
         if (body[0] === '#') {
           const code = body[1]?.toLowerCase() === 'x' ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10)
-          return String.fromCodePoint(code)
+          return codePointText(code, entity)
         }
         return NAMED_ENTITIES[body.toLowerCase()] ?? entity
       }),
@@ -127,8 +128,8 @@ export const TRANSFORMS: Transform[] = [
     label: 'Unicode unescape',
     category: 'Encoding',
     run: (s) =>
-      s.replace(/\\u\{([\da-f]+)\}|\\u([\da-f]{4})/gi, (_, wide: string | undefined, short: string | undefined) =>
-        String.fromCodePoint(parseInt(wide ?? short!, 16)),
+      s.replace(/\\u\{([\da-f]+)\}|\\u([\da-f]{4})/gi, (escape: string, wide: string | undefined, short: string | undefined) =>
+        codePointText(parseInt(wide ?? short!, 16), escape),
       ),
   },
   { id: 'sha1', label: 'SHA-1', category: 'Hashing', run: digest('SHA-1') },
@@ -208,7 +209,10 @@ export async function runPipeline(input: string, ids: readonly string[]): Promis
   let current = input
   for (const id of ids) {
     const transform = TRANSFORMS_BY_ID.get(id)
-    if (!transform) continue
+    if (!transform) {
+      steps.push({ id, label: id, output: '', error: `Unknown step "${id}"`, durationMs: 0 })
+      break
+    }
     const startedAt = performance.now()
     try {
       current = await transform.run(current)

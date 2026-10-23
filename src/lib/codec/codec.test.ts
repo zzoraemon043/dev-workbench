@@ -36,6 +36,16 @@ describe('transforms', () => {
     expect(await run('unicode-unescape', '\\u00e9\\u{1d11e}')).toBe('é𝄞')
   })
 
+  it('leaves out of range code points as written', async () => {
+    expect(await run('html-unescape', '&#9999999999;&#65;&#x110000;')).toBe('&#9999999999;A&#x110000;')
+    expect(await run('unicode-unescape', '\\u{110000}\\u0041')).toBe('\\u{110000}A')
+  })
+
+  it('rejects timestamps outside the date range', async () => {
+    await expect(run('to-unix', '99999999999999999')).rejects.toThrow(/date/)
+    await expect(run('to-unix-ms', '99999999999999999')).rejects.toThrow(/date/)
+  })
+
   it('hashes with SHA-256', async () => {
     expect(await run('sha256', 'abc')).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad')
   })
@@ -62,6 +72,11 @@ describe('runPipeline', () => {
   it('chains transforms and records each step', async () => {
     const steps = await runPipeline('hello', ['upper', 'base64-encode', 'base64-decode'])
     expect(steps.map((step) => step.output)).toEqual(['HELLO', 'SEVMTE8=', 'HELLO'])
+  })
+
+  it('reports an unknown step instead of skipping it', async () => {
+    const steps = await runPipeline('hello', ['upper', 'no-such-step', 'lower'])
+    expect(steps.map((step) => step.error)).toEqual([null, 'Unknown step "no-such-step"'])
   })
 
   it('stops at the first failing step', async () => {

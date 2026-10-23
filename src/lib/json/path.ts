@@ -98,11 +98,11 @@ function children(value: unknown, path: PathSegment[]): QueryMatch[] {
 
 function descendants(match: QueryMatch): QueryMatch[] {
   const result: QueryMatch[] = []
-  const stack = [match]
-  while (stack.length > 0) {
-    const current = stack.shift()!
+  const queue = [match]
+  for (let index = 0; index < queue.length; index++) {
+    const current = queue[index]!
     result.push(current)
-    stack.push(...children(current.value, current.path))
+    for (const child of children(current.value, current.path)) queue.push(child)
   }
   return result
 }

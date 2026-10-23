@@ -24,6 +24,11 @@ describe('queryJson', () => {
     expect(queryJson(doc, `$.store['opening hours'].mon`).map((m) => m.value)).toEqual(['9-5'])
   })
 
+  it('walks large arrays with recursive descent', () => {
+    const items = Array.from({ length: 150_000 }, (_, index) => index)
+    expect(queryJson(items, '$..*')).toHaveLength(150_000)
+  })
+
   it('supports recursive descent', () => {
     expect(queryJson(doc, '$..title').map((m) => m.value)).toEqual(['Ada', 'SICP', 'TAOCP', 'Refactoring'])
   })
