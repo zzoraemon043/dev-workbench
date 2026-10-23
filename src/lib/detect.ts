@@ -1,3 +1,4 @@
+import { base64DecodeBytes } from './codec/bytes'
 import { decodeJwt } from './jwt/jwt'
 
 export type DetectedKind = 'jwt' | 'json' | 'url' | 'base64' | 'timestamp' | 'regex' | 'websocket' | 'text'
@@ -14,7 +15,18 @@ const JWT_SHAPE = /^(Bearer\s+)?[\w-]+\.[\w-]+\.[\w-]*$/i
 const BASE64_SHAPE = /^[A-Za-z\d+/]+={0,2}$/
 const URL_SHAPE = /^https?:\/\/\S+$/i
 const WS_SHAPE = /^wss?:\/\/\S+$/i
-const REGEX_LITERAL = /^\/(.+)\/([dgimsuvy]*)$/s
+const REGEX_LITERAL = /^\/((?:\\.|\[(?:\\.|[^\]\\])*\]|[^\\/[])+)\/([dgimsuvy]*)$/s
+const strictUtf8 = new TextDecoder('utf-8', { fatal: true })
+
+function decodesToText(text: string): boolean {
+  try {
+    const decoded = strictUtf8.decode(base64DecodeBytes(text))
+    const printable = Array.from(decoded).filter((char) => /[\p{L}\p{N}\p{P}\p{S}\s]/u.test(char)).length
+    return decoded.length > 0 && printable / Array.from(decoded).length >= 0.9
+  } catch {
+    return false
+  }
+}
 const TIMESTAMP_SHAPE = /^\d{10}(\d{3})?$/
 
 function looksLikeJson(text: string): boolean {
@@ -44,7 +56,7 @@ export function detectContent(raw: string): Detection {
   if (URL_SHAPE.test(text) || /%[\da-f]{2}/i.test(text)) {
     return { kind: 'url', tool: 'codec', confidence: 0.7, label: 'URL-encoded text', pipeline: ['url-decode'] }
   }
-  if (text.length >= 8 && text.length % 4 === 0 && BASE64_SHAPE.test(text) && /[A-Z]/.test(text) && /[a-z\d]/.test(text)) {
+  if (text.length >= 8 && text.length % 4 === 0 && BASE64_SHAPE.test(text) && /[A-Z]/.test(text) && /[a-z\d]/.test(text) && decodesToText(text)) {
     return { kind: 'base64', tool: 'codec', confidence: 0.75, label: 'Base64 data', pipeline: ['base64-decode'] }
   }
   if (text.split('\n').length > 1 && text.includes('\n---\n')) {

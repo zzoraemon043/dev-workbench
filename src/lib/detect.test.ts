@@ -20,6 +20,10 @@ describe('detectContent', () => {
     expect(detectContent(input).tool).toBe(tool)
   })
 
+  it.each(['Password', 'Username', 'HelloWorld12', '/usr/local/'])('treats %s as plain text', (input) => {
+    expect(detectContent(input).kind).toBe('text')
+  })
+
   it('suggests a decode pipeline for base64 and timestamps', () => {
     expect(detectContent('SGVsbG8gV29ybGQh').pipeline).toEqual(['base64-decode'])
     expect(detectContent('1700000000000').pipeline).toEqual(['to-iso'])
