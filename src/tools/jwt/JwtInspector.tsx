@@ -216,9 +216,17 @@ function SignaturePanel({ jwt }: { jwt: DecodedJwt }) {
       toast('Payload must be a JSON object', 'error')
       return
     }
-    const token = await signHmac(jwt.header, payload as JwtJson, state.secret)
-    update({ token })
-    toast('Token re-signed')
+    if (!state.secret) {
+      toast('Enter a secret to sign with', 'error')
+      return
+    }
+    try {
+      const token = await signHmac(jwt.header, payload as JwtJson, state.secret)
+      update({ token })
+      toast('Token re-signed')
+    } catch (error) {
+      toast(`Could not sign: ${error instanceof Error ? error.message : String(error)}`, 'error')
+    }
   }
 
   useHotkeys([{ combo: 'mod+enter', allowInInputs: true, handler: () => editing && void resign() }])
