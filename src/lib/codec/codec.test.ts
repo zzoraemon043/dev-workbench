@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { DEFAULT_TOOL_STATES } from '@/store/workbench'
 import { base64UrlDecodeBytes, base64UrlEncodeBytes, hexToBytes, utf8Encode } from './bytes'
 import { TRANSFORMS_BY_ID, runPipeline } from './transforms'
 
@@ -69,6 +70,11 @@ describe('transforms', () => {
 })
 
 describe('runPipeline', () => {
+  it('decodes encoded query values only after separating the parameters', async () => {
+    const steps = await runPipeline('https://example.com/?q=R%26D&literal=%2526&plus=%2B', DEFAULT_TOOL_STATES.codec.pipeline)
+    expect(JSON.parse(steps.at(-1)!.output)).toEqual({ q: 'R&D', literal: '%26', plus: '+' })
+  })
+
   it('chains transforms and records each step', async () => {
     const steps = await runPipeline('hello', ['upper', 'base64-encode', 'base64-decode'])
     expect(steps.map((step) => step.output)).toEqual(['HELLO', 'SEVMTE8=', 'HELLO'])

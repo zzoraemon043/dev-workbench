@@ -13,6 +13,8 @@ export interface JsonStats {
 
 const POSITION_PATTERN = /position (\d+)/
 const LINE_COLUMN_PATTERN = /line (\d+) column (\d+)/
+const STRING_OR_NUMBER = /"(?:[^"\\]|\\[\s\S])*"|-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/g
+const NUMBER_MARKER = /^~\d+:/
 
 export function locate(source: string, offset: number): { line: number; column: number } {
   const before = source.slice(0, offset)
@@ -33,6 +35,35 @@ export function parseJson(source: string): JsonParseResult {
     const offset = position ? Number(position[1]) : source.length
     return { ok: false, error: message, ...locate(source, offset) }
   }
+}
+
+export function transformJson(source: string, transform: (value: unknown) => string): string {
+  const markers = new Set<string>()
+  JSON.parse(source, (key, value: unknown) => {
+    for (const text of typeof value === 'string' ? [key, value] : [key]) {
+      const marker = NUMBER_MARKER.exec(text)?.[0]
+      if (marker) markers.add(marker)
+    }
+    return value
+  })
+  let marker = '~0:'
+  for (let id = 1; markers.has(marker); id += 1) marker = '~' + id + ':'
+
+  // Protect numeric tokens with a prefix absent from every key and string value.
+  const prefix = '"' + marker
+  let remainingNumbers = 0
+  const protectedSource = source.replace(STRING_OR_NUMBER, (token) => {
+    if (token[0] === '"') return token
+    remainingNumbers += 1
+    return prefix + token + '"'
+  })
+  const output = transform(JSON.parse(protectedSource)).replace(STRING_OR_NUMBER, (token) => {
+    if (!token.startsWith(prefix)) return token
+    remainingNumbers -= 1
+    return token.slice(prefix.length, -1)
+  })
+  if (remainingNumbers !== 0) throw new Error('JSON transformation would discard numeric tokens')
+  return output
 }
 
 export function formatJson(value: unknown, indent: Indent = 2): string {

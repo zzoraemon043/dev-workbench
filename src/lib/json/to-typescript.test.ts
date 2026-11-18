@@ -41,6 +41,18 @@ describe('jsonToTypeScript', () => {
     expect(jsonToTypeScript([1, 'two'], { rootName: 'payload' })).toBe('export type Payload = (number | string)[]\n')
   })
 
+  it('reserves the requested root name before naming nested objects', () => {
+    expect(jsonToTypeScript({ root: { id: 1 } })).toBe(
+      'export interface Root {\n  root: Root2\n}\n\nexport interface Root2 {\n  id: number\n}\n',
+    )
+  })
+
+  it('keeps a root array alias when its item hint has the same name', () => {
+    expect(jsonToTypeScript([{ id: 1 }], { rootName: 'Status' })).toBe(
+      'export type Status = Status2[]\n\nexport interface Status2 {\n  id: number\n}\n',
+    )
+  })
+
   it('reuses identical shapes instead of duplicating declarations', () => {
     const output = jsonToTypeScript({ home: { lat: 1, lng: 2 }, work: { lat: 3, lng: 4 } })
     expect(output).toContain('  home: Home')

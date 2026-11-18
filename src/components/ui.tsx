@@ -68,10 +68,10 @@ export function IconButton({ icon: Icon, label, active, className, ...props }: I
   )
 }
 
-export function CopyButton({ text, label = 'Copy', disabled }: { text: string; label?: string; disabled?: boolean }) {
+export function CopyButton({ text, label = 'Copy', disabled }: { text: string | (() => string); label?: string; disabled?: boolean }) {
   const { copied, copy } = useCopy()
   return (
-    <Button size="sm" variant="ghost" icon={copied ? Check : Copy} disabled={disabled || !text} onClick={() => copy(text)}>
+    <Button size="sm" variant="ghost" icon={copied ? Check : Copy} disabled={disabled || !text} onClick={() => copy(typeof text === 'function' ? text() : text)}>
       {copied ? 'Copied' : label}
     </Button>
   )

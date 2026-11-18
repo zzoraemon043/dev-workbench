@@ -1,5 +1,7 @@
 import { create } from 'zustand'
+import { base64EncodeBytes } from '@/lib/codec/bytes'
 import type { Frame, FrameDirection } from '@/lib/socket/frames'
+import { useWorkbench } from './workbench'
 
 export type SocketStatus = 'idle' | 'connecting' | 'open' | 'closing' | 'closed' | 'error'
 
@@ -9,6 +11,7 @@ interface SocketStore {
   status: SocketStatus
   frames: Frame[]
   connectedAt: number | null
+  connectedUrl: string | null
   connect: (url: string, protocols: string[]) => void
   disconnect: () => void
   send: (data: string) => boolean
@@ -22,23 +25,24 @@ async function readPayload(data: unknown): Promise<{ text: string; binary: boole
   if (typeof data === 'string') return { text: data, binary: false, size: new Blob([data]).size }
   const buffer = data instanceof Blob ? await data.arrayBuffer() : (data as ArrayBuffer)
   const bytes = new Uint8Array(buffer)
-  const hex = Array.from(bytes.subarray(0, 512), (byte) => byte.toString(16).padStart(2, '0')).join(' ')
-  return { text: bytes.length > 512 ? `${hex} …` : hex, binary: true, size: bytes.length }
+  return { text: base64EncodeBytes(bytes), binary: true, size: bytes.length }
 }
 
 export const useSocket = create<SocketStore>()((set, get) => {
-  const record = (direction: FrameDirection, data: string, size = 0, binary = false) =>
-    set((state) => ({
-      frames: [...state.frames, { id: ++frameId, direction, data, size, binary, at: Date.now() }].slice(-MAX_FRAMES),
-    }))
+  const record = (direction: FrameDirection, data: string, size = 0, binary = false) => {
+    const frame: Frame = { id: ++frameId, direction, data, size, binary, at: Date.now(), encoding: binary ? 'base64' : undefined }
+    set((state) => ({ frames: [...state.frames, frame].slice(-MAX_FRAMES) }))
+  }
 
   return {
     status: 'idle',
     frames: [],
     connectedAt: null,
+    connectedUrl: null,
     connect: (url, protocols) => {
       get().disconnect()
-      set({ status: 'connecting' })
+      socket = null
+      set({ status: 'connecting', connectedAt: null, connectedUrl: null })
       record('system', `Connecting to ${url}`)
       let instance: WebSocket
       try {
@@ -52,7 +56,7 @@ export const useSocket = create<SocketStore>()((set, get) => {
       socket = instance
       instance.onopen = () => {
         if (socket !== instance) return
-        set({ status: 'open', connectedAt: Date.now() })
+        set({ status: 'open', connectedAt: Date.now(), connectedUrl: url })
         record('system', `Connected${instance.protocol ? ` · protocol ${instance.protocol}` : ''}`)
       }
       instance.onmessage = async (event: MessageEvent) => {
@@ -67,7 +71,7 @@ export const useSocket = create<SocketStore>()((set, get) => {
       instance.onclose = (event) => {
         if (socket !== instance) return
         socket = null
-        set({ status: 'closed', connectedAt: null })
+        set({ status: 'closed', connectedAt: null, connectedUrl: null })
         record('system', `Closed · code ${event.code}${event.reason ? ` · ${event.reason}` : ''}`)
       }
     },
@@ -77,7 +81,10 @@ export const useSocket = create<SocketStore>()((set, get) => {
       socket.close(1000, 'Closed by user')
     },
     send: (data) => {
-      if (!socket || socket.readyState !== WebSocket.OPEN) return false
+      const { status, connectedUrl } = get()
+      if (!socket || socket.readyState !== WebSocket.OPEN || status !== 'open' || connectedUrl !== useWorkbench.getState().socket.url) {
+        return false
+      }
       socket.send(data)
       record('out', data, new Blob([data]).size)
       return true

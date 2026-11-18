@@ -81,7 +81,11 @@ export default function DiffStudio() {
               onClick={() => update({ left: state.right, right: state.left })}
               title="Swap sides"
             />
-            <CopyButton text={toUnifiedPatch(lines, 'original', 'modified')} label="Patch" disabled={lines.length === 0} />
+            <CopyButton
+              text={() => toUnifiedPatch(left, right, 'a/original', 'b/original')}
+              label="Patch"
+              disabled={tooLarge || left === right || left !== state.left || right !== state.right}
+            />
           </>
         }
         bodyClassName="overflow-auto"

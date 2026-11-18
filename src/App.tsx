@@ -7,6 +7,7 @@ import { MobileToolBar, Sidebar } from '@/components/Sidebar'
 import { StatusBar } from '@/components/StatusBar'
 import { Toaster } from '@/components/Toaster'
 import { TopBar } from '@/components/TopBar'
+import { ErrorBanner } from '@/components/ui'
 import { useHashSync } from '@/hooks/useHashSync'
 import { useHotkeys, type Hotkey } from '@/hooks/useHotkeys'
 import { useSmartPaste } from '@/hooks/useSmartPaste'
@@ -46,6 +47,7 @@ export default function App() {
   useGlobalShortcuts()
 
   const activeTool = useWorkbench((state) => state.activeTool)
+  const unsavedInputs = useWorkbench((state) => state.unsavedInputs)
   const ActiveTool = TOOLS_BY_ID[activeTool].component
 
   return (
@@ -54,6 +56,13 @@ export default function App() {
       <main className="flex min-w-0 flex-1 flex-col">
         <TopBar />
         <MobileToolBar />
+        {unsavedInputs.length > 0 && (
+          <div role="status">
+            <ErrorBanner>
+              Unsaved: {unsavedInputs.join(', ')}. Browser storage is full or unavailable. These changes will be lost on reload.
+            </ErrorBanner>
+          </div>
+        )}
         <div key={activeTool} className="fade-slide min-h-0 flex-1 overflow-auto p-3 md:p-4">
           <Suspense fallback={<ToolLoading />}>
             <ActiveTool />

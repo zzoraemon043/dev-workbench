@@ -1,3 +1,5 @@
+import { base64DecodeBytes } from '@/lib/codec/bytes'
+
 export type FrameDirection = 'in' | 'out' | 'system'
 
 export interface Frame {
@@ -5,6 +7,7 @@ export interface Frame {
   direction: FrameDirection
   data: string
   binary: boolean
+  encoding?: 'base64'
   size: number
   at: number
 }
@@ -31,6 +34,15 @@ export function previewFrame(data: string, max = 140): string {
   return flat.length > max ? `${flat.slice(0, max - 1)}…` : flat
 }
 
+export function frameDisplayData(frame: Frame): string {
+  if (frame.encoding !== 'base64') return frame.data
+  const maxBytes = 512
+  const prefix = frame.data.slice(0, Math.ceil(maxBytes / 3) * 4)
+  const bytes = base64DecodeBytes(prefix).subarray(0, maxBytes)
+  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, '0')).join(' ')
+  return frame.size > maxBytes ? `${hex} …` : hex
+}
+
 export function frameStats(frames: readonly Frame[]): FrameStats {
   return frames.reduce<FrameStats>(
     (stats, frame) => {
@@ -51,7 +63,7 @@ export function filterFrames(frames: readonly Frame[], query: string, direction:
   const needle = query.trim().toLowerCase()
   return frames.filter(
     (frame) =>
-      (direction === 'all' || frame.direction === direction) && (!needle || frame.data.toLowerCase().includes(needle)),
+      (direction === 'all' || frame.direction === direction) && (!needle || frameDisplayData(frame).toLowerCase().includes(needle)),
   )
 }
 

@@ -18,6 +18,7 @@ import { cn } from '@/lib/cn'
 import { formatBytes } from '@/lib/json/parse'
 import {
   filterFrames,
+  frameDisplayData,
   frameStats,
   isValidSocketUrl,
   previewFrame,
@@ -40,7 +41,7 @@ const STATUS_STYLES: Record<SocketStatus, { dot: string; label: string }> = {
 
 export default function SocketConsole() {
   const [state, update] = useToolState('socket')
-  const { status, frames, connect, disconnect, send, clear } = useSocket()
+  const { status, connectedUrl, frames, connect, disconnect, send, clear } = useSocket()
   const [filter, setFilter] = useState('')
   const [direction, setDirection] = useState<FrameDirection | 'all'>('all')
   const [autoScroll, setAutoScroll] = useState(true)
@@ -48,6 +49,7 @@ export default function SocketConsole() {
   const visible = useMemo(() => filterFrames(frames, deferredFilter, direction), [frames, deferredFilter, direction])
   const stats = useMemo(() => frameStats(frames), [frames])
   const live = status === 'open' || status === 'connecting'
+  const canSend = status === 'open' && connectedUrl === state.url
   const draftJson = useMemo(() => tryParseJson(state.draft), [state.draft])
 
   const toggleConnection = () => {
@@ -68,7 +70,7 @@ export default function SocketConsole() {
 
   const sendDraft = () => {
     if (!state.draft) return
-    if (!send(state.draft)) toast('Connect before sending', 'error')
+    if (!send(state.draft)) toast('Connect to the requested URL before sending', 'error')
   }
 
   useHotkeys([{ combo: 'mod+enter', allowInInputs: true, handler: sendDraft }])
@@ -118,6 +120,13 @@ export default function SocketConsole() {
         </div>
       </Panel>
 
+      {connectedUrl && (
+        <p className="break-all px-3 text-xs text-muted">
+          Live endpoint: {connectedUrl}
+          {status === 'open' && !canSend && ' · Reconnect to send to the requested URL'}
+        </p>
+      )}
+
       <div className="grid min-h-0 flex-1 grid-rows-[auto_1fr] gap-3 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.3fr)] lg:grid-rows-1">
         <Panel
           title="Compose"
@@ -146,7 +155,7 @@ export default function SocketConsole() {
             <span className="ml-auto hidden items-center gap-1.5 text-[11px] text-muted sm:flex">
               <Kbd combo="mod+enter" />
             </span>
-            <Button size="sm" variant="primary" icon={Send} disabled={status !== 'open'} onClick={sendDraft}>
+            <Button size="sm" variant="primary" icon={Send} disabled={!canSend} onClick={sendDraft}>
               Send
             </Button>
           </footer>
@@ -225,7 +234,8 @@ function FrameLog({ frames, autoScroll, empty }: { frames: Frame[]; autoScroll: 
 
 function FrameRow({ frame }: { frame: Frame }) {
   const [open, setOpen] = useState(false)
-  const json = useMemo(() => (open ? tryParseJson(frame.data) : undefined), [open, frame.data])
+  const displayData = useMemo(() => frameDisplayData(frame), [frame])
+  const json = useMemo(() => (open && !frame.binary ? tryParseJson(displayData) : undefined), [open, frame.binary, displayData])
   const time = new Date(frame.at).toLocaleTimeString(undefined, { hour12: false, fractionalSecondDigits: 3 } as Intl.DateTimeFormatOptions)
 
   if (frame.direction === 'system') {
@@ -252,13 +262,13 @@ function FrameRow({ frame }: { frame: Frame }) {
           <ArrowDownLeft className="size-3.5 shrink-0 text-emerald-500" />
         )}
         <span className="shrink-0 text-muted/70">{time}</span>
-        <span className="min-w-0 flex-1 truncate">{previewFrame(frame.data)}</span>
+        <span className="min-w-0 flex-1 truncate">{previewFrame(displayData)}</span>
         {frame.binary && <Badge className="h-5">binary</Badge>}
         <span className="shrink-0 text-muted/70">{formatBytes(frame.size)}</span>
       </button>
       {open && (
         <pre className="animate-in mx-3 mb-2 max-h-80 overflow-auto rounded-lg bg-surface-2 p-2.5 leading-relaxed whitespace-pre-wrap break-all">
-          {json === undefined ? frame.data : JSON.stringify(json, null, 2)}
+          {json === undefined ? displayData : JSON.stringify(json, null, 2)}
         </pre>
       )}
     </li>

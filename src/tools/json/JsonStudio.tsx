@@ -16,7 +16,7 @@ import {
 import { CodeEditor } from '@/components/CodeEditor'
 import { Badge, Button, CopyButton, EmptyState, ErrorBanner, Kbd, Panel, Segmented, TextInput, Toggle } from '@/components/ui'
 import { useHotkeys } from '@/hooks/useHotkeys'
-import { collectStats, formatBytes, formatJson, minifyJson, parseJson, sortKeysDeep, type Indent } from '@/lib/json/parse'
+import { collectStats, formatBytes, formatJson, minifyJson, parseJson, sortKeysDeep, transformJson, type Indent } from '@/lib/json/parse'
 import { formatPath, queryJson } from '@/lib/json/path'
 import { jsonToTypeScript } from '@/lib/json/to-typescript'
 import { toast } from '@/store/toast'
@@ -46,12 +46,14 @@ export default function JsonStudio() {
   const stats = useMemo(() => (result?.ok ? collectStats(result.value, deferredInput) : null), [result, deferredInput])
 
   const transform = (fn: (value: unknown) => string, label: string) => {
-    const parsed = parseJson(state.input)
-    if (!parsed.ok) {
-      toast('Fix the JSON syntax error first', 'error')
+    let input: string
+    try {
+      input = transformJson(state.input, fn)
+    } catch (error) {
+      toast(error instanceof SyntaxError ? 'Fix the JSON syntax error first' : 'Could not transform JSON without changing its numbers', 'error')
       return
     }
-    update({ input: fn(parsed.value) })
+    update({ input })
     toast(label)
   }
 

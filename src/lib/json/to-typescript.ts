@@ -109,12 +109,14 @@ class TypeEmitter {
   private readonly bySignature = new Map<string, string>()
   private readonly usedNames = new Set<string>()
   private readonly options: Required<TypeGenOptions>
+  private readonly rootName: string
 
   constructor(options: Required<TypeGenOptions>) {
     this.options = options
+    this.rootName = this.reserve(toPascalCase(options.rootName))
   }
 
-  emit(shape: Shape, hint: string): string {
+  emit(shape: Shape, hint: string, root = false): string {
     switch (shape.kind) {
       case 'unknown':
         return 'unknown'
@@ -128,11 +130,11 @@ class TypeEmitter {
       case 'union':
         return shape.members.map((member) => this.emit(member, hint)).join(' | ')
       case 'object':
-        return this.emitObject(shape, hint)
+        return this.emitObject(shape, hint, root)
     }
   }
 
-  private emitObject(shape: Extract<Shape, { kind: 'object' }>, hint: string): string {
+  private emitObject(shape: Extract<Shape, { kind: 'object' }>, hint: string, root: boolean): string {
     const slot = this.declarations.length
     this.declarations.push(null)
     const modifier = this.options.readonly ? 'readonly ' : ''
@@ -143,8 +145,8 @@ class TypeEmitter {
     })
     const body = lines.length > 0 ? `{\n${lines.join('\n')}\n}` : '{}'
     const existing = this.bySignature.get(body)
-    if (existing) return existing
-    const name = this.reserve(toPascalCase(hint))
+    if (existing && !root) return existing
+    const name = root ? this.rootName : this.reserve(toPascalCase(hint))
     this.bySignature.set(body, name)
     this.declarations[slot] = { name, body }
     return name
@@ -162,7 +164,7 @@ class TypeEmitter {
     const blocks = declarations.map(({ name, body }) =>
       this.options.declaration === 'interface' ? `export interface ${name} ${body}` : `export type ${name} = ${body}`,
     )
-    const rootName = toPascalCase(this.options.rootName)
+    const rootName = this.rootName
     if (!declarations.some((entry) => entry.name === rootName)) {
       blocks.unshift(`export type ${rootName} = ${rootType}`)
     }
@@ -177,6 +179,6 @@ export function jsonToTypeScript(value: unknown, options: TypeGenOptions = {}): 
     declaration: options.declaration ?? 'interface',
   }
   const emitter = new TypeEmitter(resolved)
-  const rootType = emitter.emit(inferShape(value), resolved.rootName)
+  const rootType = emitter.emit(inferShape(value), resolved.rootName, true)
   return emitter.render(rootType)
 }

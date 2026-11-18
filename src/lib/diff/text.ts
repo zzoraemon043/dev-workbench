@@ -138,7 +138,15 @@ export function summarize(lines: DiffLine[]): DiffSummary {
   }
 }
 
-export function toUnifiedPatch(lines: DiffLine[], oldName = 'a', newName = 'b'): string {
-  const body = lines.map((line) => `${line.kind === 'insert' ? '+' : line.kind === 'delete' ? '-' : ' '}${line.text}`)
-  return [`--- ${oldName}`, `+++ ${newName}`, ...body].join('\n')
+export function toUnifiedPatch(before: string, after: string, oldName = 'a', newName = 'b'): string {
+  if (before === after) return ''
+  const oldLines = before.match(/[^\n]*\n|[^\n]+/g) ?? []
+  const newLines = after.match(/[^\n]*\n|[^\n]+/g) ?? []
+  const range = (count: number) => `${count === 0 ? 0 : 1},${count}`
+  const header = `--- ${oldName}\n+++ ${newName}\n@@ -${range(oldLines.length)} +${range(newLines.length)} @@\n`
+  const body = diffSequences(oldLines, newLines).map(({ kind, value }) => {
+    const prefix = kind === 'insert' ? '+' : kind === 'delete' ? '-' : ' '
+    return prefix + value + (value.endsWith('\n') ? '' : '\n\\ No newline at end of file\n')
+  })
+  return header + body.join('')
 }

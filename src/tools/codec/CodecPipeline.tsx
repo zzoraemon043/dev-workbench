@@ -5,10 +5,10 @@ import { Badge, Button, CopyButton, EmptyState, Panel, TextInput } from '@/compo
 import { rankByFuzzy } from '@/lib/fuzzy'
 import { cn } from '@/lib/cn'
 import { TRANSFORMS, TRANSFORMS_BY_ID, runPipeline, type PipelineStep, type TransformCategory } from '@/lib/codec/transforms'
-import { useToolState } from '@/store/workbench'
+import { DEFAULT_TOOL_STATES, useToolState } from '@/store/workbench'
 
 const RECIPES: Array<{ label: string; pipeline: string[] }> = [
-  { label: 'URL → JSON', pipeline: ['url-decode', 'query-to-json'] },
+  { label: 'URL → JSON', pipeline: DEFAULT_TOOL_STATES.codec.pipeline },
   { label: 'Base64 → JSON', pipeline: ['base64-decode', 'json-pretty'] },
   { label: 'Fingerprint', pipeline: ['trim', 'sha256'] },
   { label: 'Epoch → ISO', pipeline: ['to-iso'] },
